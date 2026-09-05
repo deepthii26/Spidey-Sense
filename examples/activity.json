@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "teammates": {
+    "Asha": {
+      "teammate": "Asha",
+      "files": [
+        "spidey_sense/graph.py"
+      ],
+      "status": "working",
+      "updated_at": "2026-09-05T11:48:00.000000Z"
+    },
+    "Ben": {
+      "teammate": "Ben",
+      "files": [
+        "spidey_sense/cli.py"
+      ],
+      "status": "working",
+      "updated_at": "2026-09-05T11:52:00.000000Z"
+    },
+    "Cam": {
+      "teammate": "Cam",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/DashboardView.tsx"
+      ],
+      "status": "pending",
+      "updated_at": "2026-09-05T11:43:00.000000Z"
+    },
+    "Diego": {
+      "teammate": "Diego",
+      "files": [
+        "spidey_sense/github/sync.py"
+      ],
+      "status": "done",
+      "updated_at": "2026-09-05T11:39:00.000000Z"
+    }
+  }
+}

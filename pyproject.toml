@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spidey-sense"
+version = "0.5.0"
+description = "Local dependency and teammate activity data for Spidey Sense."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{ name = "Preethesh16" }]
+
+[project.scripts]
+spidey-sense = "spidey_sense.cli:main"
+spidey-sense-activity = "spidey_sense.activity.cli:main"
+spidey-sense-blockers = "spidey_sense.blockers.cli:main"
+spidey-sense-github = "spidey_sense.github.cli:main"
+spidey-sense-dashboard = "spidey_sense.dashboard.server:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["spidey_sense*"]
