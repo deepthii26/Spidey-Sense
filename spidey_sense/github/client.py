@@ -265,7 +265,7 @@ class GitHubClient:
                 "Accept": "application/vnd.github+json",
                 "Authorization": f"Bearer {self.token}",
                 "X-GitHub-Api-Version": GITHUB_API_VERSION,
-                "User-Agent": "spidey-sense/0.6.0",
+                "User-Agent": "spidey-sense/0.7.0",
             },
             method="GET",
         )

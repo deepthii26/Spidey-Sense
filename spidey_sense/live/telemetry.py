@@ -176,7 +176,7 @@ def _codex_threads(repository: Path, timeout: float = 6.0) -> object:
                 "clientInfo": {
                     "name": "spidey_sense",
                     "title": "Spidey Sense",
-                    "version": "0.6.0",
+                    "version": "0.7.0",
                 },
                 "capabilities": {"experimentalApi": True},
             },

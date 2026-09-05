@@ -25,4 +25,4 @@ __all__ = [
     "load_dependency_graph",
     "sync_github_activity",
 ]
-__version__ = "0.6.0"
+__version__ = "0.7.0"

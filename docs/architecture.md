@@ -85,9 +85,16 @@ not older than that activity and the activity has not changed before persistence
 GitHub result at request time. Its small HTTP server exposes the aggregate payload and
 serves the production React application from `frontend/dist` on the same origin.
 
-The React application renders one path per teammate with Pending, Working, and Done
-checkpoints. A blocker colors the affected path segment red and provides an accessible
-tooltip describing the teammate and file relationship responsible.
+The React application renders one mission path per teammate with Queued, On mission,
+and Secured presentation labels over the unchanged pending/working/done status values.
+A blocker colors the affected path segment red and provides an accessible tooltip
+describing the teammate and file relationship responsible.
+
+The WebGL view derives Web Zones from repository-relative directory paths, places file
+Nodes inside each zone, and draws dependency Strands between them. Node height reflects
+dependency degree; colors and beacons layer activity, blockers, and Git worktree state
+over the same graph. This layout is computed in the frontend from the existing aggregate
+payload and does not introduce a second source of graph truth.
 
 ### Live telemetry and directives
 

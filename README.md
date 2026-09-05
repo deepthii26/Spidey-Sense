@@ -5,7 +5,7 @@
 Spidey Sense shows what every teammate is working on, how that work moves from
 pending to done, and where two active tasks can collide. It combines a repository's
 dependency structure with live teammate activity, then presents the result as a
-simple pathway dashboard.
+live three-dimensional dependency web and mission-control dashboard.
 
 The name is intentional: like Spider-Man's early-warning instinct, Spidey Sense
 surfaces danger before it lands—in this case, same-file conflicts, dependency
@@ -24,7 +24,7 @@ Phases 1 through 6 are implemented and tested end to end.
 | React pathway dashboard | Complete |
 | Live Git and AI CLI session telemetry | Complete |
 | Human task assignment and agent directive inbox | Complete |
-| Interactive 3D dependency city | Complete |
+| Interactive 3D dependency web with directory zones | Complete |
 
 ![Spidey Sense pathway dashboard](docs/assets/spidey-sense-dashboard.png)
 
@@ -43,6 +43,28 @@ The current version is deliberately local-first:
 - Every core phase exposes JSON that can be reused by another UI or service.
 - The graph, tracker, blocker engine, GitHub adapter, and frontend remain separate
   modules so each can evolve independently.
+
+## The Spidey Sense world
+
+The interface uses a compact spatial vocabulary so the visuals stay tied to real
+engineering data:
+
+| Visual term | Engineering meaning |
+| --- | --- |
+| Web Zone | A top-level directory or source area |
+| Web Node | A repository file |
+| Strand | A resolved import/dependency edge |
+| Web Runner | A teammate or discovered AI CLI session |
+| Mission | Assigned files plus pending/working/done state |
+| Web Signal | A human directive for a runner |
+| Tangle / Danger Signal | A same-file collision or directed dependency blocker |
+| Timeline Pulse | Observable Git commits, branch state, and GitHub merges |
+
+The visual model was informed by the useful “codebase as a place” interaction
+pattern in [Claude Clan](https://github.com/mittal-parth/claude-clan), while the
+art direction, terminology, components, data model, and implementation here are
+original to Spidey Sense. No third-party artwork or source code is included. See
+[Design language](docs/design-language.md) for the complete mapping.
 
 ## How it works
 
@@ -232,6 +254,7 @@ docs/             Architecture, schemas, roadmap, and integrations
 
 - [Architecture](docs/architecture.md)
 - [Changelog](CHANGELOG.md)
+- [Design language](docs/design-language.md)
 - [JSON data contracts](docs/data-contracts.md)
 - [Roadmap and phase history](docs/roadmap.md)
 - [Entire CLI and Entire Graph compatibility](docs/entire-compatibility.md)

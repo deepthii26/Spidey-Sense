@@ -18,8 +18,11 @@ the next one depended on it.
 - [x] Phase 6 — Render files as an interactive 3D dependency city, animate active
   teammates, discover supported CLI sessions, stream Git state, and expose human
   mission assignment plus an auditable directive inbox.
+- [x] Phase 6 visual identity — Group files into directory-based Web Zones, render
+  imports as Web Strands, and surface active runners and danger signals in an
+  original Spidey Sense radar theme.
 
-The city view remains a presentation layer over the existing dashboard API; it does
+The dependency-web view remains a presentation layer over the existing dashboard API; it does
 not fork or duplicate graph and blocker logic.
 
 ## Likely next integrations

@@ -9,9 +9,9 @@ import type {
 } from "../types";
 
 const providerColors: Record<string, string> = {
-  codex: "bg-emerald-400",
-  claude: "bg-orange-400",
-  entire: "bg-fuchsia-400",
+  codex: "bg-emerald-400 text-emerald-400",
+  claude: "bg-orange-400 text-orange-400",
+  entire: "bg-fuchsia-400 text-fuchsia-400",
 };
 
 export function MissionControl({
@@ -41,14 +41,17 @@ export function MissionControl({
 
   async function assignWork(event: FormEvent) {
     event.preventDefault();
-    const parsedFiles = files.split(/[\n,]/).map((file) => file.trim()).filter(Boolean);
+    const parsedFiles = files
+      .split(/[\n,]/)
+      .map((file) => file.trim())
+      .filter(Boolean);
     if (!teammate.trim() || !parsedFiles.length) {
       setNotice("Add a teammate and at least one repository-relative file.");
       return;
     }
     try {
       await onUpdateActivity({ teammate: teammate.trim(), files: parsedFiles, status });
-      setNotice(`Updated ${teammate.trim()}'s mission.`);
+      setNotice(`Mission updated for ${teammate.trim()}.`);
     } catch {
       setNotice("The mission update was rejected. Check the error above.");
     }
@@ -57,7 +60,7 @@ export function MissionControl({
   async function sendDirective(event: FormEvent) {
     event.preventDefault();
     if (!teammate.trim() || !message.trim()) {
-      setNotice("Choose a teammate and write a directive first.");
+      setNotice("Choose a teammate and write a signal first.");
       return;
     }
     const provider = selectedSession?.provider ?? "inbox";
@@ -72,25 +75,25 @@ export function MissionControl({
       setMessage("");
       setNotice(
         provider === "codex"
-          ? "Directive sent to the Codex thread."
-          : "Directive added to the agent inbox.",
+          ? "Signal sent directly to the Codex thread."
+          : "Signal queued in the shared runner inbox.",
       );
     } catch {
-      setNotice("The directive could not be delivered. Check the error above.");
+      setNotice("The signal could not be delivered. Check the error above.");
     }
   }
 
   return (
     <aside className="space-y-4" aria-label="Live mission control">
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <section className="web-panel p-4">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-[11px] font-bold uppercase text-blue-700">Agent radar</p>
-            <h2 className="font-bold text-balance">Live CLI sessions</h2>
+            <p className="web-label">Agent radar</p>
+            <h2 className="mt-1 font-bold text-white text-balance">Web runners</h2>
           </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-800">
-            <span className="size-2 rounded-full bg-emerald-500" />
-            LIVE · 3s
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+            <span className="signal-pulse size-1.5 rounded-full bg-emerald-400 text-emerald-400" />
+            Live · 3s
           </span>
         </div>
         <div className="mt-3 space-y-2">
@@ -104,27 +107,34 @@ export function MissionControl({
                   if (!teammate) setTeammate(session.name);
                 }}
                 className={cn(
-                  "w-full rounded-xl border p-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-blue-600",
+                  "w-full rounded-lg border p-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
                   sessionId === session.id
-                    ? "border-blue-400 bg-blue-50"
-                    : "border-slate-200 hover:border-slate-300",
+                    ? "border-blue-400/60 bg-blue-500/12"
+                    : "border-blue-300/10 bg-blue-300/3 hover:border-blue-300/25",
                 )}
               >
                 <div className="flex items-center justify-between gap-3">
-                  <span className="flex items-center gap-2 text-xs font-bold capitalize">
-                    <span className={cn("size-2 rounded-full", providerColors[session.provider])} />
+                  <span className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-wider text-blue-100">
+                    <span
+                      className={cn(
+                        "signal-pulse size-1.5 rounded-full",
+                        providerColors[session.provider] ?? "bg-slate-400 text-slate-400",
+                      )}
+                    />
                     {session.name} · {session.provider}
                   </span>
-                  <span className="text-[10px] font-semibold uppercase text-slate-500">{session.status}</span>
+                  <span className="font-mono text-[9px] font-semibold uppercase text-slate-500">
+                    {session.status}
+                  </span>
                 </div>
-                <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-pretty text-slate-600">
-                  {session.summary || "Session is visible; no public summary was provided."}
+                <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-pretty text-slate-400">
+                  {session.summary || "Runner detected; no public activity summary was provided."}
                 </p>
               </button>
             ))
           ) : (
-            <p className="rounded-xl bg-slate-50 p-3 text-xs leading-5 text-pretty text-slate-600">
-              No supported CLI session is active. Git file changes are still monitored live.
+            <p className="rounded-lg border border-blue-300/10 bg-blue-300/3 p-3 text-xs leading-5 text-pretty text-slate-400">
+              No supported CLI runner is active. Git file changes remain on the radar.
             </p>
           )}
         </div>
@@ -134,74 +144,74 @@ export function MissionControl({
               key={provider}
               title={state.error ?? undefined}
               className={cn(
-                "rounded-full px-2 py-1 text-[10px] font-semibold capitalize",
+                "rounded-full border px-2 py-1 font-mono text-[9px] font-semibold uppercase tracking-wider",
                 state.available && !state.error
-                  ? "bg-emerald-50 text-emerald-800"
+                  ? "border-emerald-400/15 bg-emerald-400/8 text-emerald-300"
                   : state.error
-                    ? "bg-red-50 text-red-800"
-                    : "bg-slate-100 text-slate-500",
+                    ? "border-rose-400/15 bg-rose-400/8 text-rose-300"
+                    : "border-slate-700 bg-slate-800/40 text-slate-500",
               )}
             >
-              {provider} {state.available ? (state.error ? "error" : "ready") : "not installed"}
+              {provider} {state.available ? (state.error ? "error" : "ready") : "offline"}
             </span>
           ))}
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p className="text-[11px] font-bold uppercase text-violet-700">Human steering</p>
-        <h2 className="font-bold text-balance">Change the mission</h2>
+      <section className="web-panel p-4">
+        <p className="web-label text-rose-400">Human steering</p>
+        <h2 className="mt-1 font-bold text-white text-balance">Mission dispatch</h2>
         <form className="mt-3 space-y-3" onSubmit={assignWork}>
-          <label className="block text-xs font-semibold text-slate-700">
+          <label className="block text-xs font-semibold text-slate-300">
             Teammate
             <input
               value={teammate}
               onChange={(event) => setTeammate(event.target.value)}
-              className="mt-1 min-h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-200"
+              className="web-input mt-1 px-3 text-sm"
               placeholder="Alice"
             />
           </label>
-          <label className="block text-xs font-semibold text-slate-700">
+          <label className="block text-xs font-semibold text-slate-300">
             Files in scope
             <input
               value={files}
               onChange={(event) => setFiles(event.target.value)}
-              className="mt-1 min-h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-200"
+              className="web-input mt-1 px-3 text-sm"
               placeholder="src/app.ts, src/api.ts"
             />
           </label>
           <div className="grid grid-cols-[1fr_auto] gap-2">
-            <label className="block text-xs font-semibold text-slate-700">
+            <label className="block text-xs font-semibold text-slate-300">
               Status
               <select
                 value={status}
                 onChange={(event) => setStatus(event.target.value as ActivityStatus)}
-                className="mt-1 min-h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm outline-none focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-200"
+                className="web-input mt-1 px-3 text-sm"
               >
-                <option value="pending">Pending</option>
-                <option value="working">Working</option>
-                <option value="done">Done</option>
+                <option value="pending">Queued</option>
+                <option value="working">On mission</option>
+                <option value="done">Secured</option>
               </select>
             </label>
             <button
               type="submit"
               disabled={pending}
-              className="mt-5 min-h-10 rounded-lg bg-slate-950 px-4 text-xs font-bold text-white outline-none hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-slate-700 disabled:opacity-50"
+              className="mt-5 min-h-10 rounded-md bg-[#d62950] px-4 font-mono text-[10px] font-bold uppercase tracking-wider text-white outline-none hover:bg-[#ef365f] focus-visible:ring-2 focus-visible:ring-rose-400 disabled:opacity-50"
             >
-              Assign
+              Deploy
             </button>
           </div>
         </form>
 
-        <form className="mt-4 border-t border-slate-100 pt-4" onSubmit={sendDirective}>
-          <label className="block text-xs font-semibold text-slate-700">
+        <form className="mt-4 border-t border-blue-300/10 pt-4" onSubmit={sendDirective}>
+          <label className="block text-xs font-semibold text-slate-300">
             Target CLI session
             <select
               value={sessionId}
               onChange={(event) => setSessionId(event.target.value)}
-              className="mt-1 min-h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm outline-none focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-200"
+              className="web-input mt-1 px-3 text-sm"
             >
-              <option value="">Shared directive inbox</option>
+              <option value="">Shared signal inbox</option>
               {data.live.sessions.map((session) => (
                 <option key={`${session.provider}-${session.id}`} value={session.id}>
                   {session.name} · {session.provider} · {session.status}
@@ -209,54 +219,63 @@ export function MissionControl({
               ))}
             </select>
           </label>
-          <label className="mt-3 block text-xs font-semibold text-slate-700">
+          <label className="mt-3 block text-xs font-semibold text-slate-300">
             Suggest what to do next
             <textarea
               value={message}
               onChange={(event) => setMessage(event.target.value)}
               rows={3}
               maxLength={4000}
-              className="mt-1 w-full resize-y rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-200"
+              className="web-input mt-1 resize-y px-3 py-2 text-sm"
               placeholder="Finish the API contract before changing the dashboard component."
             />
           </label>
           <button
             type="submit"
             disabled={pending}
-            className="mt-2 min-h-10 w-full rounded-lg bg-blue-600 px-4 text-xs font-bold text-white outline-none hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:opacity-50"
+            className="mt-2 min-h-10 w-full rounded-md border border-blue-400/45 bg-blue-500/16 px-4 font-mono text-[10px] font-bold uppercase tracking-wider text-blue-100 outline-none hover:bg-blue-500/25 focus-visible:ring-2 focus-visible:ring-blue-400 disabled:opacity-50"
           >
-            {selectedSession?.provider === "codex" ? "Send to Codex now" : "Queue directive"}
+            {selectedSession?.provider === "codex" ? "Send signal to Codex" : "Queue web signal"}
           </button>
         </form>
-        {notice ? <p className="mt-3 text-xs text-pretty text-slate-600" role="status">{notice}</p> : null}
+        {notice ? (
+          <p className="mt-3 text-xs text-pretty text-slate-400" role="status">
+            {notice}
+          </p>
+        ) : null}
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <section className="web-panel p-4">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="font-bold text-balance">Git pulse</h2>
-          <code className="rounded bg-slate-100 px-2 py-1 text-[10px] text-slate-700">{data.live.git.branch}</code>
+          <div>
+            <p className="web-label">Source control</p>
+            <h2 className="mt-1 font-bold text-white text-balance">Timeline pulse</h2>
+          </div>
+          <code className="rounded border border-blue-300/10 bg-blue-300/5 px-2 py-1 text-[10px] text-blue-200">
+            {data.live.git.branch}
+          </code>
         </div>
         <p className="mt-2 text-xs text-slate-500 tabular-nums">
-          {data.live.git.dirty_files.length} live file changes · head {data.live.git.head?.slice(0, 7) ?? "unborn"}
+          {data.live.git.dirty_files.length} live node changes · head {data.live.git.head?.slice(0, 7) ?? "unborn"}
         </p>
         {data.live.git.commits.slice(0, 3).map((commit) => (
-          <div key={commit.sha} className="mt-3 border-t border-slate-100 pt-3">
-            <p className="line-clamp-1 text-xs font-semibold text-slate-800">{commit.subject}</p>
-            <p className="mt-1 text-[10px] text-slate-500">
-              {commit.short_sha} · {commit.author} · {commit.files.length} files
+          <div key={commit.sha} className="mt-3 border-t border-blue-300/10 pt-3">
+            <p className="line-clamp-1 text-xs font-semibold text-slate-200">{commit.subject}</p>
+            <p className="mt-1 font-mono text-[9px] uppercase tracking-wide text-slate-500">
+              {commit.short_sha} · {commit.author} · {commit.files.length} nodes
             </p>
           </div>
         ))}
         {recentDirectives.length ? (
-          <div className="mt-4 border-t border-slate-100 pt-3">
-            <p className="text-[11px] font-bold uppercase text-slate-500">Directive trail</p>
+          <div className="mt-4 border-t border-blue-300/10 pt-3">
+            <p className="web-label text-slate-500">Signal trail</p>
             {recentDirectives.map((directive) => (
-              <div key={directive.id} className="mt-2 rounded-lg bg-slate-50 p-2.5">
-                <div className="flex justify-between gap-2 text-[10px] font-semibold uppercase text-slate-500">
+              <div key={directive.id} className="mt-2 rounded-lg border border-blue-300/10 bg-blue-300/3 p-2.5">
+                <div className="flex justify-between gap-2 font-mono text-[9px] font-semibold uppercase tracking-wider text-slate-500">
                   <span>{directive.teammate}</span><span>{directive.status}</span>
                 </div>
-                <p className="mt-1 line-clamp-2 text-xs text-pretty text-slate-700">{directive.message}</p>
-                <p className="mt-1 text-[10px] text-slate-400 tabular-nums">{formatTimestamp(directive.created_at)}</p>
+                <p className="mt-1 line-clamp-2 text-xs text-pretty text-slate-300">{directive.message}</p>
+                <p className="mt-1 text-[10px] text-slate-600 tabular-nums">{formatTimestamp(directive.created_at)}</p>
               </div>
             ))}
           </div>

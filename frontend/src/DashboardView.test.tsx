@@ -17,18 +17,18 @@ describe("DashboardView", () => {
       />,
     );
 
-    expect(screen.getByRole("heading", { name: "Team pathways" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Mission pathways" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Alice" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Bob" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Carol" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "1 blocker. Show blocker details." })).toBeInTheDocument();
     expect(screen.getByText("Bob is blocked")).toBeInTheDocument();
-    expect(screen.getByText("2 files · 1 dependency")).toBeInTheDocument();
+    expect(screen.getByText("2 nodes · 1 strand")).toBeInTheDocument();
     expect(
-      await screen.findByRole("heading", { name: "Live repository world" }),
+      await screen.findByRole("heading", { name: "The Dependency Web" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Live CLI sessions" })).toBeInTheDocument();
-    expect(await screen.findByText("3D view unavailable")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Web runners" })).toBeInTheDocument();
+    expect(await screen.findByText("3D web unavailable")).toBeInTheDocument();
   });
 
   it("calls the refresh action", () => {
@@ -44,7 +44,7 @@ describe("DashboardView", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Refresh" }));
+    fireEvent.click(screen.getByRole("button", { name: "Scan now" }));
 
     expect(refresh).toHaveBeenCalledOnce();
   });

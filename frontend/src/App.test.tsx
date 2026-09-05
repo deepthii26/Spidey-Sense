@@ -29,7 +29,7 @@ describe("App", () => {
 
     render(<App />);
 
-    expect(await screen.findByText("Couldn’t load dashboard")).toBeInTheDocument();
+    expect(await screen.findByText("Signal lost")).toBeInTheDocument();
     expect(screen.getByText("Connection refused")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Try again" })).toBeInTheDocument();
   });

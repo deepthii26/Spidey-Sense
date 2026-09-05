@@ -21,7 +21,7 @@ describe("MissionControl", () => {
       target: { value: "src/api.ts, src/db.ts" },
     });
     fireEvent.change(screen.getByLabelText("Status"), { target: { value: "working" } });
-    fireEvent.click(screen.getByRole("button", { name: "Assign" }));
+    fireEvent.click(screen.getByRole("button", { name: "Deploy" }));
 
     await waitFor(() =>
       expect(update).toHaveBeenCalledWith({
@@ -49,7 +49,7 @@ describe("MissionControl", () => {
     fireEvent.change(screen.getByLabelText("Suggest what to do next"), {
       target: { value: "Run the contract tests before changing the UI." },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Send to Codex now" }));
+    fireEvent.click(screen.getByRole("button", { name: "Send signal to Codex" }));
 
     await waitFor(() =>
       expect(createDirective).toHaveBeenCalledWith({

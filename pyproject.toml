@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "spidey-sense"
-version = "0.6.0"
+version = "0.7.0"
 description = "Live 3D dependency and AI-agent coordination radar for development teams."
 readme = "README.md"
 requires-python = ">=3.10"

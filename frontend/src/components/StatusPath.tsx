@@ -4,9 +4,9 @@ import { cn } from "../lib/utils";
 import type { ActivityRecord, ActivityStatus, Blocker } from "../types";
 
 const steps: Array<{ status: ActivityStatus; label: string }> = [
-  { status: "pending", label: "Pending" },
-  { status: "working", label: "Working" },
-  { status: "done", label: "Done" },
+  { status: "pending", label: "Queued" },
+  { status: "working", label: "On mission" },
+  { status: "done", label: "Secured" },
 ];
 
 const stepIndex: Record<ActivityStatus, number> = {
@@ -30,7 +30,7 @@ function BlockerMarker({ blockers }: { blockers: Blocker[] }) {
         <button
           type="button"
           aria-label={`${label}. Show blocker details.`}
-          className="inline-flex min-h-8 items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700 outline-none hover:bg-red-100 focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
+          className="inline-flex min-h-8 items-center gap-1.5 rounded-full border border-rose-400/25 bg-rose-400/10 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-rose-300 outline-none hover:bg-rose-400/15 focus-visible:ring-2 focus-visible:ring-rose-400"
         >
           <svg aria-hidden="true" viewBox="0 0 20 20" className="size-3.5 fill-current">
             <path d="M10 2.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15Zm.8 11.25H9.2v-1.6h1.6v1.6Zm0-3.05H9.2V6.25h1.6v4.45Z" />
@@ -41,7 +41,7 @@ function BlockerMarker({ blockers }: { blockers: Blocker[] }) {
       <Tooltip.Portal>
         <Tooltip.Content
           sideOffset={8}
-          className="z-50 max-w-80 rounded-lg bg-slate-950 px-3 py-2 text-xs leading-5 text-pretty text-white shadow-lg"
+          className="z-50 max-w-80 rounded-lg border border-blue-300/15 bg-[#050b18] px-3 py-2 text-xs leading-5 text-pretty text-white shadow-xl"
         >
           <ul className="space-y-1.5">
             {blockers.map((blocker) => (
@@ -50,7 +50,7 @@ function BlockerMarker({ blockers }: { blockers: Blocker[] }) {
               </li>
             ))}
           </ul>
-          <Tooltip.Arrow className="fill-slate-950" />
+          <Tooltip.Arrow className="fill-[#050b18]" />
         </Tooltip.Content>
       </Tooltip.Portal>
     </Tooltip.Root>
@@ -58,11 +58,11 @@ function BlockerMarker({ blockers }: { blockers: Blocker[] }) {
 }
 
 function nodeClasses(index: number, current: number, blocked: boolean, status: ActivityStatus) {
-  if (blocked && index === current) return "border-red-600 bg-red-600 text-white";
-  if (status === "done" && index <= current) return "border-emerald-600 bg-emerald-600 text-white";
-  if (index === current) return "border-blue-600 bg-blue-600 text-white";
-  if (index < current) return "border-slate-700 bg-slate-700 text-white";
-  return "border-slate-300 bg-white text-slate-400";
+  if (blocked && index === current) return "border-rose-400 bg-rose-500 text-white shadow-[0_0_20px_rgb(244_63_94/.28)]";
+  if (status === "done" && index <= current) return "border-emerald-400 bg-emerald-500/80 text-white";
+  if (index === current) return "border-blue-400 bg-blue-500 text-white shadow-[0_0_20px_rgb(59_130_246/.28)]";
+  if (index < current) return "border-blue-700 bg-blue-900 text-blue-100";
+  return "border-slate-700 bg-[#071020] text-slate-500";
 }
 
 export function StatusPath({
@@ -78,7 +78,7 @@ export function StatusPath({
   return (
     <div className="mt-6">
       <div className="mb-3 flex min-h-8 items-center justify-between gap-3">
-        <p className="text-xs font-medium text-slate-500">Delivery path</p>
+        <p className="font-mono text-[10px] font-medium uppercase tracking-wider text-slate-500">Mission route</p>
         {blocked ? <BlockerMarker blockers={blockers} /> : null}
       </div>
       <ol className="grid grid-cols-3" aria-label={`${activity.teammate} delivery progress`}>
@@ -89,9 +89,9 @@ export function StatusPath({
                 aria-hidden="true"
                 className={cn(
                   "absolute right-1/2 top-3.5 h-1 w-full",
-                  index <= current ? "bg-slate-700" : "bg-slate-200",
-                  activity.status === "done" && index <= current && "bg-emerald-600",
-                  blocked && index === current && "bg-red-600",
+                  index <= current ? "bg-blue-700" : "bg-slate-800",
+                  activity.status === "done" && index <= current && "bg-emerald-500",
+                  blocked && index === current && "bg-rose-500",
                 )}
               />
             ) : null}
@@ -113,8 +113,8 @@ export function StatusPath({
             <span
               className={cn(
                 "text-xs font-medium",
-                index === current ? "text-slate-950" : "text-slate-500",
-                blocked && index === current && "text-red-700",
+                index === current ? "text-blue-100" : "text-slate-500",
+                blocked && index === current && "text-rose-300",
               )}
             >
               {step.label}

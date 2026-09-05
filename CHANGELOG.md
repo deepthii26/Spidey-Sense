@@ -2,6 +2,24 @@
 
 All notable changes to Spidey Sense are documented here.
 
+## 0.7.0 — 2026-09-05
+
+### Added
+
+- Original Spidey Sense visual system built around Web Zones, Nodes, Strands,
+  Runners, Missions, Signals, and Tangles.
+- Directory-aware 3D node clustering, curved dependency strands, radar rings,
+  skyline lighting, agent beacons, and animated danger pulses.
+- Full dark mission-control shell with live status telemetry, GitHub timeline,
+  blocker warnings, and accessible non-WebGL behavior.
+- Design-language documentation explaining the engineering-to-visual mapping and
+  the distinction from reference projects.
+
+### Changed
+
+- Renamed presentation-layer labels without changing any public JSON status values
+  or API contracts.
+
 ## 0.6.0 — 2026-09-05
 
 ### Added
