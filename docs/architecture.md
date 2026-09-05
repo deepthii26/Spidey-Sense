@@ -1,6 +1,6 @@
 # Architecture
 
-Spidey Sense is a local-first coordination system built as five composable layers.
+Spidey Sense is a local-first coordination system built as composable layers.
 Each layer consumes and emits plain Python objects or JSON, allowing the dashboard
 to be replaced without rewriting the graph and blocker logic.
 
@@ -14,7 +14,9 @@ flowchart TB
         Store[Activity JSON store]
         Rules[Blocker detector]
         Server[Dashboard service]
-        Web[React dashboard]
+        Live[CLI and Git telemetry]
+        Inbox[Directive inbox]
+        Web[React and WebGL dashboard]
 
         Repo --> Graph
         Graph --> Rules
@@ -22,7 +24,10 @@ flowchart TB
         Graph --> Server
         Store --> Server
         Rules --> Server
+        Live --> Server
+        Inbox --> Server
         Server --> Web
+        Web --> Inbox
     end
 
     GH[GitHub REST API] --> Adapter[GitHub synchronizer]
@@ -30,7 +35,7 @@ flowchart TB
     Adapter --> Server
 ```
 
-The only component that needs network access is the optional GitHub synchronizer.
+The only component that needs internet access is the optional GitHub synchronizer.
 Repository analysis, activity storage, blocker detection, API serving, and the UI
 all operate locally.
 
@@ -84,6 +89,16 @@ The React application renders one path per teammate with Pending, Working, and D
 checkpoints. A blocker colors the affected path segment red and provides an accessible
 tooltip describing the teammate and file relationship responsible.
 
+### Live telemetry and directives
+
+`spidey_sense/live/` reads public Codex app-server metadata, Claude background-agent
+JSON, Entire session JSON when installed, and read-only Git state. Provider failures
+are isolated and reported as health data.
+
+The same module owns an atomic directive inbox. Only Codex has a direct-delivery
+adapter, implemented as the fixed `codex queue` argument vector; all other messages
+remain provider-neutral inbox records.
+
 ## Runtime data flow
 
 1. A teammate or local adapter writes activity to `.spidey-sense/activity.json`.
@@ -94,6 +109,8 @@ tooltip describing the teammate and file relationship responsible.
 5. The React client renders paths, blocker alerts, graph health, and merge details.
 6. An optional GitHub synchronization run can mark matching activity done; the next
    dashboard refresh reflects that change.
+7. The client polls every three seconds, updating the 3D world, CLI radar, Git pulse,
+   pathways, and directive trail from observable local state.
 
 ## Design decisions
 

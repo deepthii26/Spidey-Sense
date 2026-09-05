@@ -1,8 +1,20 @@
 import * as Tooltip from "@radix-ui/react-tooltip";
+import { lazy, Suspense } from "react";
 
 import { StatusPath } from "./components/StatusPath";
+import { MissionControl } from "./components/MissionControl";
 import { cn, formatTimestamp, repositoryName } from "./lib/utils";
-import type { ActivityRecord, Blocker, DashboardPayload } from "./types";
+import type {
+  ActivityRecord,
+  ActivityUpdate,
+  Blocker,
+  DashboardPayload,
+  DirectiveInput,
+} from "./types";
+
+const DependencyWorld = lazy(() =>
+  import("./components/DependencyWorld").then((module) => ({ default: module.DependencyWorld })),
+);
 
 const statusLabels = {
   pending: "Pending",
@@ -109,10 +121,16 @@ export function DashboardView({
   data,
   refreshing,
   onRefresh,
+  mutationPending,
+  onUpdateActivity,
+  onCreateDirective,
 }: {
   data: DashboardPayload;
   refreshing: boolean;
   onRefresh: () => void;
+  mutationPending: boolean;
+  onUpdateActivity: (input: ActivityUpdate) => Promise<void>;
+  onCreateDirective: (input: DirectiveInput) => Promise<void>;
 }) {
   const teammates = Object.values(data.activity.teammates).sort((left, right) =>
     left.teammate.localeCompare(right.teammate),
@@ -164,11 +182,29 @@ export function DashboardView({
         </header>
 
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
+            <Suspense
+              fallback={
+                <section className="grid min-h-[36rem] place-items-center rounded-2xl bg-slate-950 text-sm text-slate-400">
+                  Loading the 3D dependency city…
+                </section>
+              }
+            >
+              <DependencyWorld data={data} />
+            </Suspense>
+            <MissionControl
+              data={data}
+              pending={mutationPending}
+              onUpdateActivity={onUpdateActivity}
+              onCreateDirective={onCreateDirective}
+            />
+          </div>
+
           <section aria-labelledby="overview-heading">
             <h2 id="overview-heading" className="sr-only">
               Coordination overview
             </h2>
-            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div className="mt-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
               {[
                 ["Teammates", teammates.length],
                 ["Working now", workingCount],

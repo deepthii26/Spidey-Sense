@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { DashboardView } from "./DashboardView";
-import type { DashboardPayload } from "./types";
+import type { ActivityUpdate, DashboardPayload, DirectiveInput } from "./types";
 
 function LoadingDashboard() {
   return (
@@ -26,10 +26,14 @@ export default function App() {
   const [data, setData] = useState<DashboardPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [mutationPending, setMutationPending] = useState(false);
+  const [mutationError, setMutationError] = useState<string | null>(null);
 
-  const loadDashboard = useCallback(async () => {
-    setRefreshing(true);
-    setError(null);
+  const loadDashboard = useCallback(async (silent = false) => {
+    if (!silent) {
+      setRefreshing(true);
+      setError(null);
+    }
     try {
       const response = await fetch("/api/dashboard", {
         headers: { Accept: "application/json" },
@@ -40,15 +44,47 @@ export default function App() {
       }
       setData((await response.json()) as DashboardPayload);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Could not load dashboard data");
+      if (!silent) {
+        setError(caught instanceof Error ? caught.message : "Could not load dashboard data");
+      }
     } finally {
-      setRefreshing(false);
+      if (!silent) setRefreshing(false);
     }
   }, []);
 
   useEffect(() => {
     void loadDashboard();
+    const interval = window.setInterval(() => {
+      if (document.visibilityState === "visible") void loadDashboard(true);
+    }, 3000);
+    return () => window.clearInterval(interval);
   }, [loadDashboard]);
+
+  const postJSON = useCallback(
+    async (path: string, value: ActivityUpdate | DirectiveInput) => {
+      setMutationPending(true);
+      setMutationError(null);
+      try {
+        const response = await fetch(path, {
+          method: "POST",
+          headers: { Accept: "application/json", "Content-Type": "application/json" },
+          body: JSON.stringify(value),
+        });
+        if (!response.ok) {
+          const details = (await response.json().catch(() => null)) as { error?: string } | null;
+          throw new Error(details?.error ?? `Request failed with HTTP ${response.status}`);
+        }
+        await loadDashboard(true);
+      } catch (caught) {
+        const message = caught instanceof Error ? caught.message : "Could not update mission control";
+        setMutationError(message);
+        throw caught;
+      } finally {
+        setMutationPending(false);
+      }
+    },
+    [loadDashboard],
+  );
 
   if (!data && refreshing) return <LoadingDashboard />;
 
@@ -78,7 +114,19 @@ export default function App() {
           Refresh failed: {error}
         </div>
       ) : null}
-      <DashboardView data={data} refreshing={refreshing} onRefresh={() => void loadDashboard()} />
+      {mutationError ? (
+        <div role="alert" className="border-b border-red-200 bg-red-50 px-4 py-2 text-center text-sm text-red-800">
+          Mission update failed: {mutationError}
+        </div>
+      ) : null}
+      <DashboardView
+        data={data}
+        refreshing={refreshing}
+        onRefresh={() => void loadDashboard()}
+        mutationPending={mutationPending}
+        onUpdateActivity={(value) => postJSON("/api/activity", value)}
+        onCreateDirective={(value) => postJSON("/api/directives", value)}
+      />
     </>
   );
 }

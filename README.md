@@ -13,7 +13,7 @@ collisions, and work that may block another developer or coding agent.
 
 ## Project status
 
-Phases 1 through 5 are implemented and tested end to end.
+Phases 1 through 6 are implemented and tested end to end.
 
 | Capability | Status |
 | --- | --- |
@@ -22,7 +22,9 @@ Phases 1 through 5 are implemented and tested end to end.
 | Same-file and dependency blocker detection | Complete |
 | GitHub merged-PR synchronization | Complete |
 | React pathway dashboard | Complete |
-| Optional game-like city reskin | Planned stretch goal |
+| Live Git and AI CLI session telemetry | Complete |
+| Human task assignment and agent directive inbox | Complete |
+| Interactive 3D dependency city | Complete |
 
 ![Spidey Sense pathway dashboard](docs/assets/spidey-sense-dashboard.png)
 
@@ -51,12 +53,16 @@ flowchart LR
     Graph --> Detector[Blocker detector]
     Tracker --> Detector
     GitHub[GitHub merged PRs] --> Sync[Merge synchronizer]
+    CLIs[Codex / Claude / Entire] --> Live[Live telemetry]
+    Human[Human mission control] --> Directives[Directive inbox]
+    Directives --> CLIs
     Sync --> Tracker
     Graph --> API[Dashboard API]
     Tracker --> API
     Detector --> API
     Sync --> API
-    API --> UI[React pathway dashboard]
+    Live --> API
+    API --> UI[React + WebGL mission control]
 ```
 
 An edge points from the importing file to the dependency it imports. If Alice is
@@ -129,7 +135,29 @@ python -m spidey_sense.dashboard \
 ```
 
 The installed equivalents are `spidey-sense`, `spidey-sense-activity`,
-`spidey-sense-blockers`, `spidey-sense-github`, and `spidey-sense-dashboard`.
+`spidey-sense-blockers`, `spidey-sense-github`, `spidey-sense-dashboard`, and
+`spidey-sense-live`.
+
+Inspect observable Git and supported CLI state from the terminal:
+
+```bash
+python -m spidey_sense.live --pretty snapshot
+python -m spidey_sense.live --pretty inbox
+```
+
+Create a shared directive, or explicitly deliver one to a known Codex thread:
+
+```bash
+python -m spidey_sense.live send alice "Run the API tests before editing the UI"
+
+python -m spidey_sense.live send alice "Finish the contract tests" \
+  --provider codex \
+  --session-id THREAD_ID \
+  --deliver-now
+```
+
+Direct Codex delivery invokes only the documented `codex queue` command. Claude and
+Entire directives stay in the auditable inbox until an adapter acknowledges them.
 
 ## GitHub synchronization
 
@@ -177,7 +205,9 @@ The dashboard server exposes two same-origin endpoints:
 | Endpoint | Purpose |
 | --- | --- |
 | `GET /api/health` | Lightweight server health response |
-| `GET /api/dashboard` | Aggregated graph, activity, blockers, and optional GitHub sync |
+| `GET /api/dashboard` | Graph, activity, blockers, GitHub, Git, CLI sessions, and directives |
+| `POST /api/activity` | Assign files and pending/working/done state to a teammate |
+| `POST /api/directives` | Queue a human directive or explicitly deliver it to Codex |
 
 Use `--graph graph.json` to serve a prebuilt graph. Without it, the dependency graph
 is rebuilt on each dashboard refresh so current repository changes are reflected.
@@ -190,6 +220,7 @@ spidey_sense/
   blockers/       Dependency-aware conflict detection
   dashboard/      Aggregate API and static dashboard server
   github/         GitHub REST client and merge synchronizer
+  live/           Git/CLI telemetry and human directive store
   graph.py        JS/TS and Python dependency graph engine
 frontend/         React, TypeScript, Tailwind CSS dashboard
 examples/         Populated local demo data
@@ -200,9 +231,11 @@ docs/             Architecture, schemas, roadmap, and integrations
 ## Documentation
 
 - [Architecture](docs/architecture.md)
+- [Changelog](CHANGELOG.md)
 - [JSON data contracts](docs/data-contracts.md)
 - [Roadmap and phase history](docs/roadmap.md)
 - [Entire CLI and Entire Graph compatibility](docs/entire-compatibility.md)
+- [Live CLI integrations and control boundaries](docs/live-integrations.md)
 - [Contributing](CONTRIBUTING.md)
 - [Security](SECURITY.md)
 
@@ -224,13 +257,15 @@ dashboard aggregation, HTTP serving, and React rendering/error states.
 
 ## Scope and current limitations
 
-- Activity is currently entered through the CLI or a JSON file; automatic live
-  agent-session ingestion is an adapter opportunity.
+- Claude background sessions, Codex thread metadata, Entire sessions, Git changes,
+  and recent commits are discovered from their supported public interfaces.
 - Dependency parsing is intentionally focused on JavaScript, TypeScript, and Python.
 - Blockers represent coordination risk, not a claim that work must literally stop.
 - GitHub synchronization is pull-based and local; no webhook service is required.
-- The dashboard is a clean pathway view. The optional city-style visualization is
-  not part of the current release.
+- Codex supports direct queued messages. Claude and Entire remain inbox-only until
+  their public CLIs expose an equivalent safe message-delivery command.
+- Spidey Sense never displays hidden chain-of-thought. It shows public session
+  summaries, status, touched files when provided, and observable repository changes.
 
 ## License
 

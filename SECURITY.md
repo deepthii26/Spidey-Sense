@@ -30,6 +30,18 @@ or a protected reverse proxy in front of it when needed.
 The built-in server is intended for local development and demonstrations, not as a
 public internet deployment.
 
+Dashboard writes require JSON requests. The browser receives no cross-origin
+permission headers, and `OPTIONS` requests are rejected, preventing an unrelated web
+origin from silently reading or writing mission-control data.
+
+## Agent directives
+
+Spidey Sense never executes directive text as a shell command. A direct Codex send
+uses an argument array equivalent to `codex queue --thread ID --message TEXT`; the
+thread ID and message are passed as values rather than interpolated into a shell.
+Other providers remain inbox-only. Direct delivery is always initiated by an
+explicit dashboard or CLI action and is retained in the directive audit trail.
+
 ## Local files
 
 `.spidey-sense/` is ignored by Git because it may reveal current work. Custom

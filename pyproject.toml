@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "spidey-sense"
-version = "0.5.0"
-description = "Local dependency and teammate activity data for Spidey Sense."
+version = "0.6.0"
+description = "Live 3D dependency and AI-agent coordination radar for development teams."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
@@ -17,6 +17,7 @@ spidey-sense-activity = "spidey_sense.activity.cli:main"
 spidey-sense-blockers = "spidey_sense.blockers.cli:main"
 spidey-sense-github = "spidey_sense.github.cli:main"
 spidey-sense-dashboard = "spidey_sense.dashboard.server:main"
+spidey-sense-live = "spidey_sense.live.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

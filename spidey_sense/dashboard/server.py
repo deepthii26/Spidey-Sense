@@ -15,6 +15,14 @@ from urllib.parse import urlsplit
 from spidey_sense.activity import ActivityStore, ActivityStoreError
 from spidey_sense.blockers import BlockerDataError, detect_blockers
 from spidey_sense.graph import GraphBuildError, build_dependency_graph, find_git_root
+from spidey_sense.live import (
+    DirectiveDispatchError,
+    DirectiveDispatcher,
+    DirectiveStore,
+    DirectiveStoreError,
+    LiveTelemetryCollector,
+    TelemetryError,
+)
 
 
 class DashboardServerError(RuntimeError):
@@ -52,7 +60,9 @@ class DashboardService:
         activity_path: str | Path = ".spidey-sense/activity.json",
         graph_path: str | Path | None = None,
         github_sync_path: str | Path | None = None,
+        directives_path: str | Path = ".spidey-sense/directives.json",
         clock: Callable[[], datetime] | None = None,
+        telemetry: LiveTelemetryCollector | None = None,
     ) -> None:
         self.repository = find_git_root(repository)
         self.activity_store = ActivityStore(activity_path)
@@ -61,6 +71,9 @@ class DashboardService:
             Path(github_sync_path).expanduser().resolve() if github_sync_path else None
         )
         self.clock = clock or (lambda: datetime.now(timezone.utc))
+        self.directives = DirectiveStore(directives_path)
+        self.telemetry = telemetry or LiveTelemetryCollector(self.repository)
+        self.dispatcher = DirectiveDispatcher(self.directives, self.repository)
 
     def snapshot(self) -> dict[str, object]:
         graph = (
@@ -82,7 +95,34 @@ class DashboardService:
             "activity": activity,
             "blockers": blockers,
             "github_sync": github_sync,
+            "live": self.telemetry.snapshot(),
+            "directives": self.directives.snapshot(),
         }
+
+    def update_activity(self, value: object) -> dict[str, object]:
+        if not isinstance(value, dict):
+            raise DashboardServerError("activity request must be a JSON object")
+        teammate = value.get("teammate")
+        files = value.get("files")
+        status = value.get("status")
+        if not isinstance(teammate, str) or not isinstance(status, str):
+            raise DashboardServerError("activity requires teammate and status strings")
+        if not isinstance(files, list) or not all(isinstance(item, str) for item in files):
+            raise DashboardServerError("activity files must be a JSON string array")
+        return self.activity_store.upsert(teammate, files, status).to_dict()
+
+    def create_directive(self, value: object) -> dict[str, object]:
+        if not isinstance(value, dict):
+            raise DashboardServerError("directive request must be a JSON object")
+        directive = self.directives.create(
+            teammate=value.get("teammate"),
+            message=value.get("message"),
+            provider=value.get("provider", "inbox"),
+            session_id=value.get("session_id"),
+        )
+        if value.get("deliver_now") is True:
+            return self.dispatcher.dispatch(directive)
+        return directive
 
 
 def _handler_factory(
@@ -103,6 +143,30 @@ def _handler_factory(
                 return
             super().do_GET()
 
+        def do_POST(self) -> None:  # noqa: N802 - stdlib handler method name.
+            route = urlsplit(self.path).path
+            if route not in {"/api/activity", "/api/directives"}:
+                self._json_response(HTTPStatus.NOT_FOUND, {"error": "not found"})
+                return
+            try:
+                value = self._read_json_request()
+                result = (
+                    service.update_activity(value)
+                    if route == "/api/activity"
+                    else service.create_directive(value)
+                )
+                self._json_response(HTTPStatus.CREATED, result)
+            except (ActivityStoreError, DashboardServerError, DirectiveStoreError) as exc:
+                status = (
+                    HTTPStatus.BAD_GATEWAY
+                    if isinstance(exc, DirectiveDispatchError)
+                    else HTTPStatus.BAD_REQUEST
+                )
+                self._json_response(status, {"error": str(exc)})
+
+        def do_OPTIONS(self) -> None:  # noqa: N802 - stdlib handler method name.
+            self._json_response(HTTPStatus.METHOD_NOT_ALLOWED, {"error": "cross-origin writes disabled"})
+
         def do_HEAD(self) -> None:  # noqa: N802 - stdlib handler method name.
             route = urlsplit(self.path).path
             if route in {"/api/dashboard", "/api/health"}:
@@ -116,11 +180,33 @@ def _handler_factory(
         def _dashboard_response(self) -> None:
             try:
                 self._json_response(HTTPStatus.OK, service.snapshot())
-            except (ActivityStoreError, BlockerDataError, DashboardServerError, GraphBuildError) as exc:
+            except (
+                ActivityStoreError,
+                BlockerDataError,
+                DashboardServerError,
+                DirectiveStoreError,
+                GraphBuildError,
+                TelemetryError,
+            ) as exc:
                 self._json_response(
                     HTTPStatus.INTERNAL_SERVER_ERROR,
                     {"error": str(exc)},
                 )
+
+        def _read_json_request(self) -> object:
+            content_type = self.headers.get("Content-Type", "").split(";", 1)[0].strip().lower()
+            if content_type != "application/json":
+                raise DashboardServerError("Content-Type must be application/json")
+            try:
+                length = int(self.headers.get("Content-Length", "0"))
+            except ValueError as exc:
+                raise DashboardServerError("invalid Content-Length") from exc
+            if length <= 0 or length > 65_536:
+                raise DashboardServerError("request body must be between 1 byte and 64 KiB")
+            try:
+                return json.loads(self.rfile.read(length))
+            except (UnicodeError, json.JSONDecodeError) as exc:
+                raise DashboardServerError(f"invalid JSON request: {exc}") from exc
 
         def _json_response(self, status: HTTPStatus, value: object) -> None:
             body = (json.dumps(value, separators=(",", ":")) + "\n").encode("utf-8")
@@ -164,6 +250,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--graph", type=Path, help="Optional prebuilt Phase 1 graph JSON.")
     parser.add_argument("--github-sync", type=Path, help="Optional Phase 4 sync-result JSON.")
     parser.add_argument(
+        "--directives",
+        type=Path,
+        default=Path(".spidey-sense/directives.json"),
+        help="Human-to-agent directive inbox JSON.",
+    )
+    parser.add_argument(
         "--frontend",
         type=Path,
         default=Path("frontend/dist"),
@@ -182,9 +274,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             activity_path=args.activity,
             graph_path=args.graph,
             github_sync_path=args.github_sync,
+            directives_path=args.directives,
         )
         server = create_server(service, args.frontend, host=args.host, port=args.port)
-    except (DashboardServerError, GraphBuildError, OSError) as exc:
+    except (DashboardServerError, GraphBuildError, TelemetryError, OSError) as exc:
         print(f"spidey-sense-dashboard: error: {exc}", file=sys.stderr)
         return 2
 

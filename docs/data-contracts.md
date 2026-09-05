@@ -119,10 +119,42 @@ Commit entries may include `entire_checkpoint_ids`, extracted from
   },
   "activity": {"schema_version": "1.0", "teammates": {}},
   "blockers": [],
-  "github_sync": null
+  "github_sync": null,
+  "live": {
+    "schema_version": "1.0",
+    "observed_at": "2026-09-05T12:05:00Z",
+    "git": {"branch": "main", "head": null, "remote": null, "dirty_files": [], "commits": []},
+    "sessions": [],
+    "providers": {}
+  },
+  "directives": {"schema_version": "1.0", "directives": []}
 }
 ```
 
 `github_sync` is `null` when no synchronization result file is configured. Consumers
 should use `schema_version` and ignore unknown additive fields within the same major
 version.
+
+## Directive inbox
+
+```json
+{
+  "schema_version": "1.0",
+  "directives": [
+    {
+      "id": "7e1b8c10-3c04-42d1-8c3a-5d79aab4cc92",
+      "teammate": "Alice",
+      "message": "Run the contract tests before changing the UI.",
+      "provider": "codex",
+      "session_id": "thread-id",
+      "status": "sent",
+      "created_at": "2026-09-05T12:06:00Z",
+      "delivered_at": "2026-09-05T12:06:01Z",
+      "error": null
+    }
+  ]
+}
+```
+
+Directive status is `queued`, `sent`, `acknowledged`, or `failed`. Message text is
+data, never executable shell content.

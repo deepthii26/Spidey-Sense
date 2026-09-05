@@ -47,4 +47,44 @@ export const dashboardFixture: DashboardPayload = {
     },
   ],
   github_sync: null,
+  live: {
+    schema_version: "1.0",
+    observed_at: "2026-09-05T12:00:00Z",
+    git: {
+      branch: "main",
+      head: "8bb4323dd842a113512f128467b46dc5ee00c75e",
+      remote: "git@github.com:Preethesh16/SpideySense.git",
+      dirty_files: [{ path: "src/app.ts", status: "M" }],
+      commits: [
+        {
+          sha: "8bb4323dd842a113512f128467b46dc5ee00c75e",
+          short_sha: "8bb4323",
+          author: "Preethesh16",
+          committed_at: "2026-09-05T11:30:00Z",
+          subject: "Launch Spidey Sense coordination dashboard",
+          files: ["src/app.ts", "src/core.ts"],
+        },
+      ],
+    },
+    sessions: [
+      {
+        id: "thread-1",
+        provider: "codex",
+        name: "Codex",
+        status: "recent",
+        summary: "Build a live 3D dependency view",
+        updated_at: "2026-09-05T12:00:00Z",
+        cwd: "/work/spidey-sense",
+        files: [],
+        model: "openai",
+        can_message: true,
+      },
+    ],
+    providers: {
+      codex: { available: true, error: null, sessions: 1 },
+      claude: { available: true, error: null, sessions: 0 },
+      entire: { available: false, error: null },
+    },
+  },
+  directives: { schema_version: "1.0", directives: [] },
 };

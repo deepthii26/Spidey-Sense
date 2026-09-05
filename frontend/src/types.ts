@@ -57,6 +57,46 @@ export interface GitHubSyncResult {
   skipped_updates: unknown[];
 }
 
+export interface LiveSession {
+  id: string;
+  provider: "codex" | "claude" | "entire";
+  name: string;
+  status: string;
+  summary: string;
+  updated_at: string | null;
+  cwd: string | null;
+  files: string[];
+  model: string | null;
+  can_message: boolean;
+}
+
+export interface GitTelemetry {
+  branch: string;
+  head: string | null;
+  remote: string | null;
+  dirty_files: Array<{ path: string; status: string }>;
+  commits: Array<{
+    sha: string;
+    short_sha: string;
+    author: string;
+    committed_at: string;
+    subject: string;
+    files: string[];
+  }>;
+}
+
+export interface Directive {
+  id: string;
+  teammate: string;
+  message: string;
+  provider: "inbox" | "codex" | "claude" | "entire";
+  session_id: string | null;
+  status: "queued" | "sent" | "acknowledged" | "failed";
+  created_at: string;
+  delivered_at: string | null;
+  error: string | null;
+}
+
 export interface DashboardPayload {
   schema_version: "1.0";
   generated_at: string;
@@ -72,4 +112,32 @@ export interface DashboardPayload {
   };
   blockers: Blocker[];
   github_sync: GitHubSyncResult | null;
+  live: {
+    schema_version: "1.0";
+    observed_at: string;
+    git: GitTelemetry;
+    sessions: LiveSession[];
+    providers: Record<
+      string,
+      { available: boolean; error: string | null; sessions?: number }
+    >;
+  };
+  directives: {
+    schema_version: "1.0";
+    directives: Directive[];
+  };
+}
+
+export interface ActivityUpdate {
+  teammate: string;
+  files: string[];
+  status: ActivityStatus;
+}
+
+export interface DirectiveInput {
+  teammate: string;
+  message: string;
+  provider: "inbox" | "codex" | "claude" | "entire";
+  session_id?: string;
+  deliver_now: boolean;
 }

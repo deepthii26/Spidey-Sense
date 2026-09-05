@@ -15,21 +15,17 @@ the next one depended on it.
   mark overlapping activity done.
 - [x] Phase 5 — Render responsive teammate pathways, checkpoint status, and blocker
   explanations in a React dashboard.
+- [x] Phase 6 — Render files as an interactive 3D dependency city, animate active
+  teammates, discover supported CLI sessions, stream Git state, and expose human
+  mission assignment plus an auditable directive inbox.
 
-## Stretch goal
-
-- [ ] Phase 6 — Add an optional game-like city skin where files or modules become
-  buildings and dependency relationships become roads or routes.
-
-The city view should remain a presentation layer over the existing dashboard API;
-it must not fork or duplicate graph and blocker logic.
+The city view remains a presentation layer over the existing dashboard API; it does
+not fork or duplicate graph and blocker logic.
 
 ## Likely next integrations
 
-- Automatic activity ingestion from Claude Code, Codex CLI, editor events, or a
-  local file watcher.
-- An Entire CLI session adapter using its public JSON output.
-- An Entire Graph adapter for higher-fidelity symbol relationships.
+- Optional agent hooks that map Claude/Codex tool events directly to activity files.
+- An Entire Graph adapter for higher-fidelity symbol relationships and evidence.
 - Incremental graph updates for large monorepos.
 - Configurable blocker rules and risk severity.
 - Historical activity and blocker-resolution timelines.
