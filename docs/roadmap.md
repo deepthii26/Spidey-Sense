@@ -40,3 +40,21 @@ not fork or duplicate graph and blocker logic.
 Spidey Sense should keep the warning explainable. Every visual alert must trace back
 to a concrete same-file overlap or dependency edge, even as the visualization and
 providers become more sophisticated.
+
+## Collaborative platform checkpoints
+
+The local prototype is now the foundation for a shared small-team product. The
+architecture and ordered checkpoints are defined in
+[`checkpoints/CP-001-architecture-foundation.md`](checkpoints/CP-001-architecture-foundation.md).
+
+- [x] CP-001 — Align the collaborative platform architecture, connector boundary,
+  team planning model, GitHub conflict evidence, security model, and two-branch
+  workflow.
+- [ ] CP-002 — Implement team, role, repository, plan, work-item, assignment,
+  dependency, and checkpoint domains.
+- [ ] CP-003 — Implement pairing and the privacy-scoped Spidey Connector protocol.
+- [ ] CP-004 — Add live Team Lobby and Plan Web visualization with streamed updates.
+- [ ] CP-005 — Add GitHub App webhooks, conflict incidents, and rule-based resolution
+  guidance.
+- [ ] CP-006 — Harden directive adapters, authorization, audit, retention,
+  accessibility, and team isolation.

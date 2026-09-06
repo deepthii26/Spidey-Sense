@@ -15,6 +15,11 @@ collisions, and work that may block another developer or coding agent.
 
 Phases 1 through 6 are implemented and tested end to end.
 
+The next collaborative-platform architecture is established in
+[Checkpoint CP-001](docs/checkpoints/CP-001-architecture-foundation.md). Active work
+uses the `progress` branch and reaches `main` only through an owner-approved
+checkpoint promotion.
+
 | Capability | Status |
 | --- | --- |
 | JavaScript, TypeScript, and Python dependency graph | Complete |
@@ -253,6 +258,8 @@ docs/             Architecture, schemas, roadmap, and integrations
 ## Documentation
 
 - [Architecture](docs/architecture.md)
+- [Collaborative platform architecture checkpoint](docs/checkpoints/CP-001-architecture-foundation.md)
+- [Branching and checkpoint policy](docs/branching-and-checkpoints.md)
 - [Changelog](CHANGELOG.md)
 - [Design language](docs/design-language.md)
 - [JSON data contracts](docs/data-contracts.md)
