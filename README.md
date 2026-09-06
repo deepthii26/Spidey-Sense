@@ -260,6 +260,7 @@ docs/             Architecture, schemas, roadmap, and integrations
 - [Architecture](docs/architecture.md)
 - [Collaborative platform architecture checkpoint](docs/checkpoints/CP-001-architecture-foundation.md)
 - [Branching and checkpoint policy](docs/branching-and-checkpoints.md)
+- [First teammate implementation prompt](docs/teammate-prompts/CP-002A-planning-domain.md)
 - [Changelog](CHANGELOG.md)
 - [Design language](docs/design-language.md)
 - [JSON data contracts](docs/data-contracts.md)
