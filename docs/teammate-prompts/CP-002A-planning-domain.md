@@ -24,18 +24,29 @@ The project permits only two branches:
 
 Do not create another branch. Do not commit or push directly to `main`.
 
-After extracting the ZIP, confirm the repository and synchronize before editing:
+Use the ZIP to understand the project, but do development in a fresh Git clone so
+the archive cannot introduce stale repository internals or generated dependencies:
 
 ```bash
-git remote -v
-git fetch origin
-git switch progress 2>/dev/null || git switch -c progress origin/progress
+git clone git@github.com:Preethesh16/Spidey-Sense.git
+cd Spidey-Sense
+git switch progress
 git pull --ff-only origin progress
 git status
 ```
 
-If the working tree is not clean or the remote is unexpected, stop and report it.
-Do not reset, discard, or overwrite existing work.
+If SSH access is not configured, clone the public repository over HTTPS:
+
+```bash
+git clone https://github.com/Preethesh16/Spidey-Sense.git
+cd Spidey-Sense
+git switch progress
+```
+
+Do not copy the ZIP's `.git`, `node_modules`, `frontend/dist`, caches, or local
+`.spidey-sense` state into the clone. If the working tree is not clean or the remote
+is unexpected, stop and report it. Do not reset, discard, or overwrite existing
+work.
 
 ## Read first
 
