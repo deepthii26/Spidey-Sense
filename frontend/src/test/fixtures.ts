@@ -53,7 +53,7 @@ export const dashboardFixture: DashboardPayload = {
     git: {
       branch: "main",
       head: "8bb4323dd842a113512f128467b46dc5ee00c75e",
-      remote: "git@github.com:Preethesh16/SpideySense.git",
+      remote: "git@github.com:Preethesh16/Spidey-Sense.git",
       dirty_files: [{ path: "src/app.ts", status: "M" }],
       commits: [
         {

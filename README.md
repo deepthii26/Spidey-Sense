@@ -110,8 +110,8 @@ The Python core has no third-party runtime dependencies.
 ### Run the included demo
 
 ```bash
-git clone https://github.com/Preethesh16/SpideySense.git
-cd SpideySense
+git clone https://github.com/Preethesh16/Spidey-Sense.git
+cd Spidey-Sense
 
 python -m venv .venv
 source .venv/bin/activate

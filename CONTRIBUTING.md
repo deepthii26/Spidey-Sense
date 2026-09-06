@@ -6,8 +6,8 @@ modular design and preserve the JSON contracts between phases.
 ## Development setup
 
 ```bash
-git clone https://github.com/Preethesh16/SpideySense.git
-cd SpideySense
+git clone https://github.com/Preethesh16/Spidey-Sense.git
+cd Spidey-Sense
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -e .

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "repository": "Preethesh16/SpideySense",
+  "repository": "Preethesh16/Spidey-Sense",
   "checked_at": "2026-09-05T11:40:00.000000Z",
   "merged_pull_requests": [
     {
@@ -9,7 +9,7 @@
       "author_login": "diego",
       "merged_at": "2026-09-05T11:38:00Z",
       "merge_commit_sha": "f20acbed1234567890",
-      "html_url": "https://github.com/Preethesh16/SpideySense/pull/24",
+      "html_url": "https://github.com/Preethesh16/Spidey-Sense/pull/24",
       "files": [
         "spidey_sense/github/sync.py"
       ],

@@ -51,6 +51,6 @@ contain deliberate sample data.
 ## Reporting a vulnerability
 
 Please use GitHub's private security-advisory reporting for
-`Preethesh16/SpideySense` when available. Otherwise, open a minimal issue that asks
+`Preethesh16/Spidey-Sense` when available. Otherwise, open a minimal issue that asks
 the maintainer for a private contact channel without publishing exploit details or
 credentials.
